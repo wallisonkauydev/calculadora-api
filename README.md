@@ -1,36 +1,211 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧮 Calculadora API
 
-## Getting Started
+Sistema full-stack de cálculos matemáticos com API REST e interface web.
 
-First, run the development server:
+## 📖 Sobre o Sistema
+
+A **Calculadora API** é um sistema que permite realizar operações matemáticas através de uma API REST, com interface web interativa para facilitar o uso. O histórico de cálculos é armazenado localmente no navegador de cada usuário, garantindo privacidade.
+
+### ✨ Funcionalidades
+
+- **6 tipos de cálculos disponíveis:**
+  - **Soma**: Soma de todos os números
+  - **Média**: Média aritmética simples
+  - **Mediana**: Valor central da lista ordenada
+  - **Moda**: Valor mais frequente
+  - **Maior Número**: Retorna o maior valor
+  - **Menor Número**: Retorna o menor valor
+
+- **Histórico Individual**: Cada usuário tem seu próprio histórico armazenado no navegador (sessionStorage)
+- **Interface Moderna**: Design clean com cores pastel azul e roxo
+- **API REST**: Endpoint documentado e pronto para integração
+
+---
+
+## 🛠️ Stack
+
+### Frontend
+- **[Next.js 14]** - Framework React full-stack com App Router
+- **[TypeScript]** - Tipagem estática para maior segurança
+- **[Tailwind CSS]** - Framework CSS utility-first
+- **[shadcn/ui]** - Componentes UI acessíveis e customizáveis
+- **[Lucide React]** - Biblioteca de ícones moderna
+
+### Backend
+- **[Next.js API Routes]** - Rotas de API serverless
+- **TypeScript** - Validações e tipagem no servidor
+
+### Persistência
+- **SessionStorage (Cliente)** - Armazena histórico no navegador do usuário
+- **In-Memory (Servidor)** - Não persiste dados entre usuários (stateless)
+
+---
+
+## 🔌 API Documentation
+
+### Endpoint: POST `/api/calculo`
+
+Realiza um cálculo matemático e retorna o resultado.
+
+#### Request
+
+```json
+{
+  "type": "soma" | "media" | "mediana" | "moda" | "maior_numero" | "menor_numero",
+  "numbers": [1, 2, 3, 4, 5]
+}
+```
+
+#### Response (Sucesso)
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "1697558400000",
+    "type": "soma",
+    "numbers": [1, 2, 3, 4, 5],
+    "result": 15,
+    "timestamp": "2025-10-17T12:00:00.000Z"
+  }
+}
+```
+
+#### Response (Erro)
+
+```json
+{
+  "success": false,
+  "error": "Campo 'type' é obrigatório"
+}
+```
+
+#### Validações
+
+- `type`: Obrigatório, deve ser um dos 6 tipos válidos
+- `numbers`: Obrigatório, array não vazio de números válidos
+
+---
+
+## 🧪 Testando a API no Insomnia
+
+### 1. Configurando a Requisição
+
+#### Passo 1: Criar Nova Request
+- Clique em `+` → `New HTTP Request`
+- Dê um nome: `Calcular Soma`
+
+#### Passo 2: Configurar o Método e URL
+- **Método**: `POST`
+- **URL**: `https://calculadora-api-nine.vercel.app/api/calculo`
+
+- **Método**: `GET`
+- **URL**: `https://calculadora-api-nine.vercel.app/api/history`
+
+#### Passo 3: Configurar o Body
+- Selecione a aba `Body`
+- Escolha `JSON`
+- Cole o seguinte JSON:
+
+```json
+{
+  "type": "soma",
+  "numbers": [1, 2, 3, 4, 5]
+}
+```
+
+#### Passo 4: Enviar a Requisição
+- Clique no botão `Send`
+- Veja a resposta no painel direito
+
+---
+
+## 💻 Rodando o Projeto Localmente
+
+### Pré-requisitos
+
+- **Node.js 18+** instalado
+- **npm**, **yarn** ou **pnpm**
+
+### Passo a Passo
+
+#### 1. Clone o repositório
+
+```bash
+git clone https://github.com/seu-usuario/calculadora-api.git
+cd calculadora-api
+```
+
+#### 2. Instale as dependências
+
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+```
+
+#### 3. Execute o servidor de desenvolvimento
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### 4. Acesse no navegador
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Abra [http://localhost:3000] para ver a aplicação rodando.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📂 Estrutura do Projeto
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+├── api/
+│   ├── calculo/
+│   │   └── route.ts           # POST /api/calculo
+│   └── history/
+│       └── route.ts           # GET /api/history
+├── components/
+│   ├── Header.tsx
+│   ├── CalculationForm.tsx
+│   ├── HistoryPanel.tsx
+│   └── HistoryItem.tsx
+├── services/
+│   ├── calculation.service.ts
+│   ├── storage.service.ts
+│   ├── storage.client.service.ts
+│   └── api.service.ts
+├── types/
+│   └── calculation.types.ts
+├── constants/
+│   └── calculation.constants.ts
+├── utils/
+│   └── calculation.utils.ts
+└── page.tsx
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎨 Interface do Usuário
 
-## Deploy on Vercel
+A interface possui:
+- **Formulário de cálculo** com seleção visual dos tipos
+- **Campo de entrada** para números separados por vírgula
+- **Exibição do resultado** em destaque
+- **Painel de histórico** com todos os cálculos realizados na sessão
+- **Design responsivo** que funciona em desktop e mobile
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 Privacidade
+
+O histórico de cálculos é armazenado **apenas no navegador do usuário** (sessionStorage), garantindo que:
+- ✅ Cada usuário vê apenas seus próprios cálculos
+- ✅ Nenhum dado é compartilhado entre usuários
+- ✅ O histórico é limpo ao fechar o navegador/aba
