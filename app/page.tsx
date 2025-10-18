@@ -10,6 +10,7 @@ import {
   CalculationResult,
 } from "./types/calculation.types";
 import { calculationUtils } from "./utils/calculation.utils";
+import { clientStorageService } from "./services/storage.client.service";
 
 export default function CalculadoraAPI() {
   const [numbers, setNumbers] = useState<string>("");
@@ -19,24 +20,11 @@ export default function CalculadoraAPI() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Carregar histórico ao montar o componente
+  // Carregar histórico do sessionStorage ao montar o componente
   useEffect(() => {
-    loadHistory();
+    const storedHistory = clientStorageService.getAll();
+    setHistory(storedHistory);
   }, []);
-
-  // Função para carregar histórico da API
-  const loadHistory = async () => {
-    try {
-      const response = await fetch("/api/history");
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        setHistory(data.data);
-      }
-    } catch (err) {
-      console.error("Erro ao carregar histórico:", err);
-    }
-  };
 
   // Função para realizar cálculo via API
   const handleCalculate = async () => {
@@ -58,7 +46,7 @@ export default function CalculadoraAPI() {
         numbers: numbersArray,
       };
 
-      // Chamar API POST /api/calculo
+      // Chamar API POST /api/calculo (apenas para calcular)
       const response = await fetch("/api/calculo", {
         method: "POST",
         headers: {
@@ -70,8 +58,12 @@ export default function CalculadoraAPI() {
       const data = await response.json();
 
       if (data.success && data.data) {
+        // Salvar no sessionStorage do navegador (cliente)
+        clientStorageService.save(data.data);
+
+        // Atualizar estado
         setResult(data.data.result);
-        await loadHistory(); // Recarregar histórico
+        setHistory(clientStorageService.getAll());
       } else {
         setError(data.error || "Erro ao calcular");
       }
@@ -82,22 +74,11 @@ export default function CalculadoraAPI() {
     }
   };
 
-  // Função para limpar histórico via API
-  const handleClearHistory = async () => {
-    try {
-      const response = await fetch("/api/history", {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setHistory([]);
-        setResult(null);
-      }
-    } catch (err) {
-      console.error("Erro ao limpar histórico:", err);
-    }
+  // Função para limpar histórico do sessionStorage
+  const handleClearHistory = () => {
+    clientStorageService.clear();
+    setHistory([]);
+    setResult(null);
   };
 
   return (

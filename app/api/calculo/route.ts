@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Executar cálculo
+    // Executar cálculo (apenas retorna o resultado, não salva)
     const result = apiService.calculate(body);
 
     return NextResponse.json<ApiResponse<CalculationResult>>(

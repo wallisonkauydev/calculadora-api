@@ -3,10 +3,9 @@ import {
   CalculationResult,
 } from "../types/calculation.types";
 import { calculationService } from "./calculation.service";
-import { storageService } from "./storage.service";
 
 export const apiService = {
-  // Executa o cálculo e salva no histórico
+  // Executa o cálculo e retorna o resultado (NÃO salva mais)
   calculate: (request: CalculationRequest): CalculationResult => {
     const calculateFn = calculationService[request.type];
 
@@ -28,17 +27,7 @@ export const apiService = {
       timestamp: new Date().toISOString(),
     };
 
-    storageService.save(calculation);
+    // Removido: não salva mais no servidor
     return calculation;
-  },
-
-  // Retorna todo o histórico
-  getHistory: (): CalculationResult[] => {
-    return storageService.getAll();
-  },
-
-  // Limpa o histórico
-  clearHistory: (): void => {
-    storageService.clear();
   },
 };
