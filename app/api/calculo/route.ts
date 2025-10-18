@@ -6,11 +6,12 @@ import {
   CalculationResult,
 } from "../../types/calculation.types";
 
+// POST /api/calculo — executa um cálculo e retorna o resultado (sem persistir)
 export async function POST(request: NextRequest) {
   try {
     const body: CalculationRequest = await request.json();
 
-    // Validação do corpo da requisição
+    // Validações básicas do payload
     if (!body.type) {
       return NextResponse.json<ApiResponse<null>>(
         { success: false, error: 'Campo "type" é obrigatório' },
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar se todos os elementos são números
+    // Garante que todos os itens são números válidos
     const allNumbers = body.numbers.every(
       (n) => typeof n === "number" && !isNaN(n)
     );
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Executar cálculo (apenas retorna o resultado, não salva)
+    // Chama o serviço de cálculo e formata a resposta
     const result = apiService.calculate(body);
 
     return NextResponse.json<ApiResponse<CalculationResult>>(
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    // Tratamento genérico de exceções não previstas
     console.error("Erro ao processar cálculo:", error);
 
     return NextResponse.json<ApiResponse<null>>(

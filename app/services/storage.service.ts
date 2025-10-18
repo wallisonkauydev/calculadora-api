@@ -1,18 +1,18 @@
 import { CalculationResult } from "../types/calculation.types";
 
 export const storageService = {
-  // Não salva mais nada (histórico é no cliente)
+  // Mantido apenas por compatibilidade — histórico agora é controlado no cliente
   save: (calculation: CalculationResult): void => {
-    // Removido: não salva mais no servidor
+    // Função desativada: persistência no servidor foi removida
   },
 
-  // Retorna array vazio (histórico é no cliente)
+  // Retorna vazio, pois não há mais armazenamento no backend
   getAll: (): CalculationResult[] => {
     return [];
   },
 
-  // Não faz nada (histórico é no cliente)
+  // Método placeholder — não há mais limpeza no lado do servidor
   clear: (): void => {
-    // Removido: não limpa mais no servidor
+    // Função desativada intencionalmente
   },
 };

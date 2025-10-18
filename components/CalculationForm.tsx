@@ -3,16 +3,17 @@ import { CalculationType } from "../app/types/calculation.types";
 import { CALC_TYPES } from "../app/constants/calculation.constants";
 
 interface CalculationFormProps {
-  numbers: string;
-  selectedType: CalculationType;
-  result: number | null;
-  error: string;
-  loading?: boolean;
-  onNumbersChange: (value: string) => void;
-  onTypeChange: (type: CalculationType) => void;
-  onCalculate: () => void;
+  numbers: string; // string de entrada (números separados por vírgula)
+  selectedType: CalculationType; // tipo de operação selecionada
+  result: number | null; // resultado do cálculo (ou null)
+  error: string; // mensagem de erro exibida ao usuário
+  loading?: boolean; // estado de carregamento para desabilitar UI
+  onNumbersChange: (value: string) => void; // callback para atualizar a entrada
+  onTypeChange: (type: CalculationType) => void; // callback para trocar o tipo
+  onCalculate: () => void; // callback para disparar o cálculo
 }
 
+// Formulário principal: entrada dos números, seleção do tipo e disparo do cálculo
 export const CalculationForm: React.FC<CalculationFormProps> = ({
   numbers,
   selectedType,
@@ -34,6 +35,7 @@ export const CalculationForm: React.FC<CalculationFormProps> = ({
     </div>
 
     <div className="space-y-5">
+      {/* Campo de entrada (controlado) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Números
@@ -48,6 +50,7 @@ export const CalculationForm: React.FC<CalculationFormProps> = ({
         />
       </div>
 
+      {/* Grid de tipos de cálculo */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-3">
           Tipo de Cálculo
@@ -63,6 +66,7 @@ export const CalculationForm: React.FC<CalculationFormProps> = ({
                   ? "bg-gradient-to-br from-blue-400 to-purple-400 border-purple-300 text-white shadow-md"
                   : "bg-white border-gray-200 text-gray-700 hover:border-purple-300 hover:bg-purple-50"
               }`}
+              aria-pressed={selectedType === type.value} // acessibilidade: indica seleção
             >
               <div className="text-2xl mb-1">{type.icon}</div>
               <div className="text-xs font-medium">{type.label}</div>
@@ -71,6 +75,7 @@ export const CalculationForm: React.FC<CalculationFormProps> = ({
         </div>
       </div>
 
+      {/* Botão de ação principal */}
       <button
         onClick={onCalculate}
         disabled={loading}
@@ -79,19 +84,21 @@ export const CalculationForm: React.FC<CalculationFormProps> = ({
         {loading ? "Calculando..." : "Calcular"}
       </button>
 
+      {/* Feedback de erro (quando presente) */}
       {error && (
         <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
           <p className="text-red-600 text-sm font-medium">{error}</p>
         </div>
       )}
 
+      {/* Painel de resultado (renderiza apenas quando não é null) */}
       {result !== null && (
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center">
           <p className="text-sm text-purple-600 mb-2 font-medium uppercase tracking-wide">
             Resultado
           </p>
           <p className="text-5xl font-bold text-gray-800">
-            {result.toFixed(2)}
+            {result.toFixed(2)} {/* exibição com duas casas decimais */}
           </p>
         </div>
       )}

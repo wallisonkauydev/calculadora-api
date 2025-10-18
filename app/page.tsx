@@ -13,6 +13,7 @@ import { calculationUtils } from "./utils/calculation.utils";
 import { clientStorageService } from "./services/storage.client.service";
 
 export default function CalculadoraAPI() {
+  // Estados controlados da UI e resultado
   const [numbers, setNumbers] = useState<string>("");
   const [selectedType, setSelectedType] = useState<CalculationType>("soma");
   const [result, setResult] = useState<number | null>(null);
@@ -20,19 +21,20 @@ export default function CalculadoraAPI() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Carregar histórico do sessionStorage ao montar o componente
+  // Carrega o histórico previamente salvo no sessionStorage ao montar
   useEffect(() => {
     const storedHistory = clientStorageService.getAll();
     setHistory(storedHistory);
   }, []);
 
-  // Função para realizar cálculo via API
+  // Dispara cálculo via API e persiste no sessionStorage em caso de sucesso
   const handleCalculate = async () => {
     setError("");
     setResult(null);
     setLoading(true);
 
     try {
+      // Normaliza/valida a entrada de números
       const numbersArray = calculationUtils.parseNumbers(numbers);
 
       if (numbersArray.length === 0) {
@@ -46,7 +48,7 @@ export default function CalculadoraAPI() {
         numbers: numbersArray,
       };
 
-      // Chamar API POST /api/calculo (apenas para calcular)
+      // POST /api/calculo: endpoint de cálculo (somente processamento, sem persistência no servidor)
       const response = await fetch("/api/calculo", {
         method: "POST",
         headers: {
@@ -58,23 +60,22 @@ export default function CalculadoraAPI() {
       const data = await response.json();
 
       if (data.success && data.data) {
-        // Salvar no sessionStorage do navegador (cliente)
+        // Persiste o resultado no sessionStorage (lado cliente) e atualiza estado local
         clientStorageService.save(data.data);
-
-        // Atualizar estado
         setResult(data.data.result);
         setHistory(clientStorageService.getAll());
       } else {
         setError(data.error || "Erro ao calcular");
       }
     } catch (err) {
+      // Superfície de erro simples para UX previsível
       setError(err instanceof Error ? err.message : "Erro ao calcular");
     } finally {
       setLoading(false);
     }
   };
 
-  // Função para limpar histórico do sessionStorage
+  // Limpa histórico local (sessionStorage) e estado relacionado
   const handleClearHistory = () => {
     clientStorageService.clear();
     setHistory([]);
@@ -91,6 +92,7 @@ export default function CalculadoraAPI() {
 
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
+            {/* Formulário principal: entrada, tipo de cálculo e disparo da ação */}
             <CalculationForm
               numbers={numbers}
               selectedType={selectedType}
@@ -104,11 +106,13 @@ export default function CalculadoraAPI() {
           </div>
 
           <div className="lg:col-span-1">
+            {/* Painel lateral de histórico com ação de limpar */}
             <HistoryPanel history={history} onClear={handleClearHistory} />
           </div>
         </div>
       </div>
 
+      {/* Estilização discreta da barra de rolagem para painéis com overflow */}
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
