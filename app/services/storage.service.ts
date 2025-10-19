@@ -1,18 +1,27 @@
 import { CalculationResult } from "../types/calculation.types";
 
+// Serviço responsável por armazenar o histórico de cálculos em memória.
+let memoryDatabase: CalculationResult[] = [];
+
 export const storageService = {
-  // Mantido apenas por compatibilidade — histórico agora é controlado no cliente
+  // Salva um novo cálculo no banco em memória.
   save: (calculation: CalculationResult): void => {
-    // Função desativada: persistência no servidor foi removida
+    // Adiciona no início da lista (ordem: mais recente → mais antigo)
+    memoryDatabase.unshift(calculation);
   },
 
-  // Retorna vazio, pois não há mais armazenamento no backend
+  // Retorna uma cópia completa do histórico de cálculos.
   getAll: (): CalculationResult[] => {
-    return [];
+    return [...memoryDatabase];
   },
 
-  // Método placeholder — não há mais limpeza no lado do servidor
+  // Remove todos os registros do histórico em memória.
   clear: (): void => {
-    // Função desativada intencionalmente
+    memoryDatabase = [];
+  },
+
+  // Retorna a quantidade de registros armazenados.
+  count: (): number => {
+    return memoryDatabase.length;
   },
 };

@@ -1,5 +1,3 @@
-// app/components/HistoryItem.tsx
-
 import React from "react";
 import { CalculationResult } from "../app/types/calculation.types";
 import { calculationUtils } from "../app/utils/calculation.utils";

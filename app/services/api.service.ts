@@ -3,34 +3,44 @@ import {
   CalculationResult,
 } from "../types/calculation.types";
 import { calculationService } from "./calculation.service";
+import { storageService } from "./storage.service";
 
 export const apiService = {
-  // Realiza o cálculo com base no tipo solicitado e retorna o resultado
+  // Executa o cálculo de acordo com o tipo solicitado e armazena o resultado no histórico.
   calculate: (request: CalculationRequest): CalculationResult => {
-    // Seleciona dinamicamente a função correspondente ao tipo de cálculo
     const calculateFn = calculationService[request.type];
 
     if (!calculateFn) {
-      throw new Error("Tipo de cálculo inválido"); // valida tipo inexistente
+      throw new Error("Tipo de cálculo inválido");
     }
 
     if (!Array.isArray(request.numbers) || request.numbers.length === 0) {
-      throw new Error("Array de números inválido ou vazio"); // evita execução com dados inválidos
+      throw new Error("Array de números inválido ou vazio");
     }
 
-    // Executa a função de cálculo específica
     const result = calculateFn(request.numbers);
 
-    // Monta o objeto padronizado de resultado
     const calculation: CalculationResult = {
-      id: Date.now().toString(), // gera ID único com timestamp
+      id: Date.now().toString(), // ID único baseado no timestamp atual
       type: request.type,
       numbers: request.numbers,
       result,
       timestamp: new Date().toISOString(),
     };
 
-    // Nota: resultado não é mais persistido no servidor
+    // Persiste o resultado no histórico local
+    storageService.save(calculation);
+
     return calculation;
+  },
+
+  // Retorna todos os cálculos armazenados no histórico.
+  getHistory: (): CalculationResult[] => {
+    return storageService.getAll();
+  },
+
+  // Remove todos os registros do histórico de cálculos.
+  clearHistory: (): void => {
+    storageService.clear();
   },
 };

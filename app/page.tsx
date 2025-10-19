@@ -10,7 +10,6 @@ import {
   CalculationResult,
 } from "./types/calculation.types";
 import { calculationUtils } from "./utils/calculation.utils";
-import { clientStorageService } from "./services/storage.client.service";
 
 export default function CalculadoraAPI() {
   const [numbers, setNumbers] = useState<string>("");
@@ -20,18 +19,35 @@ export default function CalculadoraAPI() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Carrega o histórico inicial da API ao montar o componente
   useEffect(() => {
-    setHistory(clientStorageService.getAll());
+    loadHistory();
   }, []);
 
+  // Busca o histórico de cálculos da API
+  const loadHistory = async () => {
+    try {
+      const response = await fetch("/api/history");
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        setHistory(data.data);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar histórico:", err);
+    }
+  };
+
+  // Executa o cálculo via API
   const handleCalculate = async () => {
     setError("");
     setResult(null);
     setLoading(true);
 
     try {
-      // Valida e faz o parse da entrada do usuário
+      // Converte a string de entrada em um array de números válidos
       const numbersArray = calculationUtils.parseNumbers(numbers);
+
       if (numbersArray.length === 0) {
         setError("Por favor, insira pelo menos um número");
         setLoading(false);
@@ -43,38 +59,51 @@ export default function CalculadoraAPI() {
         numbers: numbersArray,
       };
 
-      // Chama a API e trata a resposta
+      // Envia a requisição de cálculo para o backend
       const response = await fetch("/api/calculo", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(request),
       });
+
       const data = await response.json();
 
       if (data.success && data.data) {
-        // Persiste no storage e atualiza estado com o resultado e histórico
-        clientStorageService.save(data.data);
-        setResult(data.data.result);
-        setHistory(clientStorageService.getAll());
+        setResult(data.data.result); // Exibe o resultado do cálculo
+        await loadHistory(); // Atualiza o histórico após novo cálculo
       } else {
         setError(data.error || "Erro ao calcular. Tente novamente.");
       }
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? calculationUtils.formatError(err)
-          : "Erro ao processar o cálculo. Verifique sua entrada."
-      );
+      // Exibe uma mensagem amigável de erro
+      if (err instanceof Error) {
+        setError(calculationUtils.formatError(err));
+      } else {
+        setError("Erro ao processar o cálculo. Verifique sua entrada.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Limpa histórico persistido e estado atual
-  const handleClearHistory = () => {
-    clientStorageService.clear();
-    setHistory([]);
-    setResult(null);
+  // Limpa o histórico de cálculos armazenado na API
+  const handleClearHistory = async () => {
+    try {
+      const response = await fetch("/api/history", {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setHistory([]);
+        setResult(null);
+      }
+    } catch (err) {
+      console.error("Erro ao limpar histórico:", err);
+    }
   };
 
   return (
@@ -105,6 +134,7 @@ export default function CalculadoraAPI() {
         </div>
       </div>
 
+      {/* Estilização da barra de rolagem */}
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
