@@ -1,48 +1,39 @@
-import {
-  CalculationRequest,
-  CalculationResult,
-} from "../../types/calculation.types";
-import { calculationService } from "../../services/calculation.service";
+import { NextResponse } from "next/server";
 import { storageService } from "../../services/storage.service";
 
-export const apiService = {
-  // Executa o cálculo conforme o tipo informado e registra o resultado no histórico.
+// define o runtime e desabilita cache dinâmico para compatibilidade no App Router
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  calculate: (request: CalculationRequest): CalculationResult => {
-    const calculateFn = calculationService[request.type];
+// retorna todos os cálculos armazenados no histórico
+export async function GET() {
+  try {
+    const history = storageService.getAll();
+    return NextResponse.json({ success: true, data: history }, { status: 200 });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Erro ao obter histórico";
+    // loga o objeto bruto para debug, sem afetar a resposta ao cliente
+    console.error("Erro ao obter histórico:", error);
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 }
+    );
+  }
+}
 
-    if (!calculateFn) {
-      throw new Error("Tipo de cálculo inválido");
-    }
-
-    if (!Array.isArray(request.numbers) || request.numbers.length === 0) {
-      throw new Error("Array de números inválido ou vazio");
-    }
-
-    const result = calculateFn(request.numbers);
-
-    const calculation: CalculationResult = {
-      id: Date.now().toString(), // ID único baseado no timestamp
-      type: request.type,
-      numbers: request.numbers,
-      result,
-      timestamp: new Date().toISOString(),
-    };
-
-    // Persiste o resultado no histórico local do servidor
-    storageService.save(calculation);
-
-    return calculation;
-  },
-
-  // Retorna todos os cálculos armazenados no histórico.
-  getHistory: (): CalculationResult[] => {
-    return storageService.getAll();
-  },
-
-  // Remove todos os registros do histórico de cálculos.
-
-  clearHistory: (): void => {
+// remove todos os registros do histórico
+export async function DELETE() {
+  try {
     storageService.clear();
-  },
-};
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Erro ao limpar histórico";
+    console.error("Erro ao limpar histórico:", error);
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 }
+    );
+  }
+}

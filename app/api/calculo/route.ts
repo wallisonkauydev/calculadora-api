@@ -9,11 +9,12 @@ import {
 const MAX_NUMBER = 999999999999;
 const MIN_NUMBER = -999999999999;
 
+// Handler responsável por processar o cálculo enviado pelo cliente
 export async function POST(request: NextRequest) {
   try {
     const body: CalculationRequest = await request.json();
 
-    // Valida o tipo de cálculo solicitado
+    // Verifica se o tipo de cálculo foi informado
     if (!body.type) {
       return NextResponse.json<ApiResponse<null>>(
         { success: false, error: 'Campo "type" é obrigatório' },
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Valida o array de números recebido
+    // Garante que o campo "numbers" é um array válido
     if (!body.numbers || !Array.isArray(body.numbers)) {
       return NextResponse.json<ApiResponse<null>>(
         {
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Impede envio de array vazio
     if (body.numbers.length === 0) {
       return NextResponse.json<ApiResponse<null>>(
         { success: false, error: "Por favor, insira pelo menos um número" },
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Garante que o número está dentro dos limites definidos
+      // Garante que o número está dentro dos limites estabelecidos
       if (num > MAX_NUMBER) {
         return NextResponse.json<ApiResponse<null>>(
           {
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Garante que o tipo de cálculo é suportado
+    // Define os tipos de cálculo aceitos
     const validTypes = [
       "soma",
       "media",
@@ -102,6 +104,8 @@ export async function POST(request: NextRequest) {
       "maior_numero",
       "menor_numero",
     ];
+
+    // Rejeita tipos não suportados
     if (!validTypes.includes(body.type)) {
       return NextResponse.json<ApiResponse<null>>(
         {
@@ -112,7 +116,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Executa o cálculo via service
+    // Executa o cálculo usando o serviço central
     const result = apiService.calculate(body);
 
     return NextResponse.json<ApiResponse<CalculationResult>>(
@@ -120,6 +124,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    // Captura e trata qualquer erro inesperado no processamento
     console.error("Erro ao processar cálculo:", error);
 
     return NextResponse.json<ApiResponse<null>>(
