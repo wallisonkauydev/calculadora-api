@@ -77,6 +77,6 @@ export const calculationUtils = {
       return message;
     }
 
-    return "Erro ao processar os números. Verifique sua entrada.";
+    return "Por favor, insira pelo menos um número";
   },
 };
