@@ -5,7 +5,8 @@ export type CalculationType =
   | "menor_numero"
   | "media"
   | "soma"
-  | "moda";
+  | "moda"
+  | "pegarNumeroQueMaisAparece"
 
 // Estrutura esperada na requisição enviada à API
 export interface CalculationRequest {

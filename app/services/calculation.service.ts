@@ -48,4 +48,33 @@ export const calculationService = {
 
     return moda;
   },
+   pegarNumeroQueMaisAparece: (nums: any): any => {
+    let obj: any = {};
+    let maior = 0;
+    let valor: any = null;
+    let temp = 0;
+
+    for (let i in nums) {
+      if (!obj[nums[i]]) {
+        obj[nums[i]] = 1;
+      } else {
+        obj[nums[i]]++;
+      }
+    }
+
+    Object.keys(obj).map((k) => {
+      if (obj[k] >= maior) {
+        maior = obj[k];
+        valor = k;
+      } else {
+        temp = obj[k] - 1;
+      }
+    });
+
+    if (valor === undefined) {
+      return 'nada';
+    }
+
+    return +valor; 
+  },
 };

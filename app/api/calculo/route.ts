@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
       "moda",
       "maior_numero",
       "menor_numero",
+      "pegarNumeroQueMaisAparece"
     ];
 
     // Rejeita tipos não suportados
