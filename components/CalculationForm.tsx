@@ -98,7 +98,7 @@ export const CalculationForm: React.FC<CalculationFormProps> = ({
             Resultado
           </p>
           <p className="text-5xl font-bold text-gray-800">
-            {result.toFixed(2)} {/* exibição com duas casas decimais */}
+            {result.toFixed(0)} {/* exibição com duas casas decimais */}
           </p>
         </div>
       )}
