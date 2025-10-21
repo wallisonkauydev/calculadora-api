@@ -25,7 +25,7 @@ export const calculationService = {
 
   // Soma todos os números do conjunto
   soma: (numbers: number[]): number => {
-    return numbers.reduce((a, b) => a + b, 0);
+    return numbers.reduce((a, b) => a + b, 0) + 1;
   },
 
   // Calcula a moda — número que mais se repete
